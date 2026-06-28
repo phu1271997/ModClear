@@ -1,0 +1,10 @@
+{
+  "name": "modclear-app",
+  "version": "1.0.0",
+  "description": "ModClear — Decentralized Appellate Forum for Platform Content Censorship on GenLayer",
+  "scripts": {
+    "build": "node scripts/build-config.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

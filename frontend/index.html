@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ModClear — Content Censorship Appeals Court</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Palette: "appellate dossier" — purple-ink + seal red */
+    --ink:#181420;
+    --bg:#14101c;
+    --panel:#1d1828;
+    --panel-2:#241d33;
+    --paper:#ece7f1;
+    --muted:#9b91ad;
+    --line:#352b4a;
+    --seal:#c0392b;
+    --uphold:#c0392b;
+    --overturn:#3fae7a;
+    --partial:#d9a531;
+    --accent:#8b6fc4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--paper);
+    font-family:'Public Sans',system-ui,sans-serif;line-height:1.55;min-height:100vh;
+    background-image:radial-gradient(circle at 50% -10%,rgba(139,111,196,.10),transparent 55%);
+  }
+  .wrap{max-width:1020px;margin:0 auto;padding:0 20px 80px}
+
+  header{padding:36px 0 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;gap:4px}
+  .docket{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent)}
+  h1{font-family:'Spectral',serif;font-weight:700;font-size:40px;line-height:1;letter-spacing:-.01em}
+  .tag{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:460px}
+  .wallet{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  button.connect{font-family:'Space Mono',monospace;font-size:12.5px;background:var(--accent);color:#150f20;border:none;padding:11px 18px;cursor:pointer;border-radius:2px;font-weight:700;transition:filter .15s,transform .08s}
+  button.connect:hover{filter:brightness(1.12)}
+  button.connect:active{transform:translateY(1px)}
+  .addr{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted)}
+
+  /* Thesis */
+  .thesis{margin:28px 0 6px;padding:24px 26px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--bg));border-radius:4px;position:relative;overflow:hidden}
+  .thesis::after{content:"APPEAL";position:absolute;right:-10px;top:6px;font-family:'Spectral',serif;font-weight:700;font-size:120px;color:rgba(139,111,196,.06);letter-spacing:-.04em;pointer-events:none}
+  .thesis h2{font-family:'Spectral',serif;font-weight:600;font-size:20px;margin-bottom:6px;position:relative}
+  .thesis p{font-size:13.5px;color:var(--muted);max-width:680px;position:relative}
+  .rulings{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;position:relative}
+  .chip{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.06em;padding:5px 11px;border-radius:2px;border:1px solid currentColor}
+  .chip.up{color:var(--uphold)} .chip.ov{color:var(--overturn)} .chip.pa{color:var(--partial)}
+
+  nav.tabs{display:flex;margin:32px 0 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  nav.tabs button{background:none;border:none;cursor:pointer;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:13px 18px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  nav.tabs button.active{color:var(--paper);border-bottom-color:var(--accent)}
+
+  .panel{display:none;padding:28px 0}
+  .panel.active{display:block}
+  .card{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:24px;margin-bottom:18px}
+  .card h3{font-family:'Spectral',serif;font-weight:600;font-size:18px;margin-bottom:4px}
+  .card .sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+  label{display:block;font-size:12px;font-weight:600;margin:14px 0 5px}
+  label .hint{font-weight:400;color:var(--muted);font-size:11.5px}
+  input,textarea,select{width:100%;font-family:'Public Sans',sans-serif;font-size:14px;color:var(--paper);background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:10px 12px}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+  textarea{resize:vertical;min-height:60px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:180px}
+  button.act{margin-top:20px;font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;background:var(--accent);color:#150f20;border:none;padding:12px 22px;cursor:pointer;border-radius:2px;transition:filter .15s,transform .08s}
+  button.act:hover{filter:brightness(1.12)}
+  button.act:active{transform:translateY(1px)}
+  button.act:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+  button.ghost{background:none;border:1px solid var(--accent);color:var(--accent)}
+  button.ghost:hover{background:var(--accent);color:#150f20}
+
+  .status{font-family:'Space Mono',monospace;font-size:12.5px;padding:12px 16px;border-radius:2px;margin-top:16px;display:none;align-items:center;gap:12px}
+  .status.show{display:flex}
+  .status.work{background:rgba(139,111,196,.12);color:#c3b2e6;border:1px solid var(--line)}
+  .status.ok{background:rgba(63,174,122,.12);color:var(--overturn);border:1px solid rgba(63,174,122,.4)}
+  .status.err{background:rgba(192,57,43,.12);color:#e88a80;border:1px solid rgba(192,57,43,.4)}
+  .spin{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;flex-shrink:0}
+  @keyframes s{to{transform:rotate(360deg)}}
+
+  /* Verdict / dossier */
+  .verdict{border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:18px;background:var(--panel)}
+  .vhead{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line)}
+  .vhead .id{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+  .ruling-seal{font-family:'Spectral',serif;font-weight:700;font-size:22px;padding:6px 16px;border:2px solid currentColor;border-radius:3px;transform:rotate(-2deg)}
+  .ruling-seal.UPHELD{color:var(--uphold)} .ruling-seal.OVERTURNED{color:var(--overturn)} .ruling-seal.PARTIAL{color:var(--partial)}
+  .vbody{padding:22px 20px}
+  .meta{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+  .meta strong{color:var(--paper)}
+  .conf{margin:16px 0 6px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.06em}
+  .confbar{height:8px;background:var(--bg);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+  .conffill{height:100%;background:linear-gradient(90deg,var(--accent),#b69af0)}
+  .rationale{margin-top:18px;padding:16px 18px;background:var(--panel-2);border-left:3px solid var(--accent);border-radius:0 2px 2px 0;font-size:14px}
+  .rationale .rl{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .links{font-size:12.5px;color:var(--muted);margin-top:14px}
+  .links a{color:#b69af0}
+  .mono{font-family:'Space Mono',monospace}
+  .note{font-size:11.5px;color:var(--muted);margin-top:8px;font-style:italic}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  @media(max-width:560px){h1{font-size:30px}.thesis::after{font-size:80px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="docket">Synthetic Jurisdiction · Content Appeals</span>
+      <h1>ModClear</h1>
+      <p class="tag">Decentralized appellate court for creators facing wrongful removals, demonetization, or account strikes. Independent AI jury analyzes both content and policy for objective, public, and immutable consensus.</p>
+    </div>
+    <div class="wallet">
+      <button class="connect" id="connectBtn">Connect Wallet</button>
+      <span class="addr" id="addrLabel"></span>
+    </div>
+  </header>
+
+  <section class="thesis">
+    <h2>Decisions are only upheld if content explicitly violates the cited policy clause.</h2>
+    <p>Every appeal is adjudicated by a decentralized AI jury. Validators analyze the original content and the public policy page directly, reaching consensus only if their independent rulings align—offense alone is not a violation.</p>
+    <div class="rulings">
+      <span class="chip ov">OVERTURNED · Cleared</span>
+      <span class="chip pa">PARTIAL · Partial Win</span>
+      <span class="chip up">UPHELD · Upheld</span>
+    </div>
+  </section>
+
+  <nav class="tabs">
+    <button class="active" data-tab="file">1 · File Appeal</button>
+    <button data-tab="judge">2 · Summon AI Jury</button>
+    <button data-tab="lookup">Search Verdicts</button>
+  </nav>
+
+  <!-- TAB 1 -->
+  <div class="panel active" id="tab-file">
+    <div class="card">
+      <h3>File Appeal & Deposit Fee</h3>
+      <p class="sub">Submit the content URL along with the cited policy clause. A spam-prevention deposit is required, fully refunded if the appeal succeeds.</p>
+      <div class="row">
+        <div>
+          <label>Platform</label>
+          <input id="f_platform" placeholder="e.g. YouTube, TikTok, X" />
+        </div>
+        <div>
+          <label>Action Type</label>
+          <select id="f_action">
+            <option value="REMOVAL">REMOVAL — Content Removal</option>
+            <option value="DEMONETIZATION">DEMONETIZATION — Demonetization</option>
+            <option value="STRIKE">STRIKE — Account Strike</option>
+            <option value="AGE_RESTRICT">AGE_RESTRICT — Age Restriction</option>
+          </select>
+        </div>
+        <div>
+          <label>Deposit Fee <span class="hint">(lowest unit)</span></label>
+          <input id="f_fee" type="number" min="1" placeholder="5000" />
+        </div>
+      </div>
+      <label>Actioned Content URL <span class="hint">(must be public and accessible)</span></label>
+      <input id="f_content" placeholder="https://..." />
+      <label>Cited Policy URL</label>
+      <input id="f_policy" placeholder="https://..." />
+      <label>Section of policy clause creator claims was misapplied</label>
+      <textarea id="f_quote" placeholder="e.g. 'Content that is not advertiser-friendly will be demonetized.'"></textarea>
+      <label>Creator Statement (your defense argument)</label>
+      <textarea id="f_statement" placeholder="e.g. The video only discusses academic topics and does not violate this clause."></textarea>
+      <button class="act" id="f_btn">Deposit & Submit Appeal</button>
+      <div class="status" id="f_status"></div>
+      <p class="note">You must connect your wallet. The deposit is locked in the contract until the final verdict is settled.</p>
+    </div>
+  </div>
+
+  <!-- TAB 2 -->
+  <div class="panel" id="tab-judge">
+    <div class="card">
+      <h3>Summon AI Jury</h3>
+      <p class="sub">Validators retrieve content and policy directly from the web, evaluate compliance, and reach consensus. This may take 1-2 minutes for the network to agree.</p>
+      <div class="row"><div><label>Appeal ID</label><input id="j_id" type="number" min="0" placeholder="0" /></div></div>
+      <button class="act" id="j_btn">Run Adjudication</button>
+      <div class="status" id="j_status"></div>
+    </div>
+    <div class="card">
+      <h3>Settle Deposit Fee</h3>
+      <p class="sub">Post-verdict settlement: OVERTURNED or PARTIAL refunds the creator. UPHELD transfers the deposit to the treasury.</p>
+      <div class="row"><div><label>Appeal ID</label><input id="s_id" type="number" min="0" placeholder="0" /></div></div>
+      <button class="act ghost" id="s_btn">Settle Fee</button>
+      <div class="status" id="s_status"></div>
+    </div>
+  </div>
+
+  <!-- TAB lookup -->
+  <div class="panel" id="tab-lookup">
+    <div class="card">
+      <h3>Search Appeals & Verdicts</h3>
+      <p class="sub">Read the state directly from the Intelligent Contract.</p>
+      <div class="row"><div><label>Appeal ID</label><input id="l_id" type="number" min="0" placeholder="0" /></div></div>
+      <button class="act ghost" id="l_btn">Search</button>
+      <div class="status" id="l_status"></div>
+    </div>
+    <div id="l_result"></div>
+  </div>
+
+  <footer>
+    <span>ModClear · Intelligent Contract on GenLayer (testnet Bradbury)</span>
+    <span class="mono" id="contractLabel">contract: unconfigured</span>
+  </footer>
+</div>
+
+<script type="module">
+import { createClient, createAccount } from "https://cdn.jsdelivr.net/npm/genlayer-js@latest/+esm";
+import { simulator, studionet } from "https://cdn.jsdelivr.net/npm/genlayer-js@latest/chains/+esm";
+import { CONTRACT_ADDRESS, CHAIN } from "./src/config.js";
+
+const chain = CHAIN === "studio" ? studionet : simulator;
+let account=null, client=null;
+const $=(id)=>document.getElementById(id);
+$("contractLabel").textContent="contract: "+(CONTRACT_ADDRESS||"unconfigured");
+
+function setStatus(el,kind,msg,spin=false){el.className="status show "+kind;el.innerHTML=(spin?'<span class="spin"></span>':'')+'<span>'+msg+'</span>';}
+function clearStatus(el){el.className="status";}
+
+$("connectBtn").addEventListener("click", async ()=>{
+  try{
+    if(window.ethereum){const [addr]=await window.ethereum.request({method:"eth_requestAccounts"});account=createAccount(addr);}
+    else{account=createAccount();}
+    client=createClient({chain,account});
+    const a=account.address;
+    $("addrLabel").textContent=a.slice(0,6)+"…"+a.slice(-4);
+    $("connectBtn").textContent="Connected";
+  }catch(e){$("addrLabel").textContent="Wallet connection error";console.error(e);}
+});
+
+function ensureReady(el){
+  if(!client||!account){setStatus(el,"err","Please connect your wallet first.");return false;}
+  if(!CONTRACT_ADDRESS){setStatus(el,"err","Contract address is not configured in src/config.js.");return false;}
+  return true;
+}
+async function writeTx(method,args,value){
+  const txHash=await client.writeContract({address:CONTRACT_ADDRESS,functionName:method,args,value:value?BigInt(value):0n});
+  await client.waitForTransactionReceipt({hash:txHash,status:"FINALIZED"});
+  return txHash;
+}
+async function readContract(method,args){return client.readContract({address:CONTRACT_ADDRESS,functionName:method,args});}
+
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");$("tab-"+b.dataset.tab).classList.add("active");
+  });
+});
+
+// 1. File appeal
+$("f_btn").addEventListener("click", async ()=>{
+  const el=$("f_status"); if(!ensureReady(el))return;
+  try{
+    const platform=$("f_platform").value.trim();
+    const action=$("f_action").value;
+    const fee=$("f_fee").value.trim();
+    const content=$("f_content").value.trim();
+    const policy=$("f_policy").value.trim();
+    const quote=$("f_quote").value.trim();
+    const statement=$("f_statement").value.trim();
+    if(!fee||!content||!policy){setStatus(el,"err","Spam-prevention fee, content URL, and policy URL are required.");return;}
+    setStatus(el,"work","Submitting transaction & awaiting consensus...",true);
+    await writeTx("file_appeal",[platform,action,content,policy,quote,statement],fee);
+    const total=await readContract("get_total_appeals",[]);
+    setStatus(el,"ok","Submitted appeal #"+(Number(total)-1)+" and locked deposit.");
+  }catch(e){setStatus(el,"err","Error: "+(e.message||e));console.error(e);}
+});
+
+// 2. Adjudicate
+$("j_btn").addEventListener("click", async ()=>{
+  const el=$("j_status"); if(!ensureReady(el))return;
+  try{
+    const id=$("j_id").value.trim(); if(id===""){setStatus(el,"err","Please specify a valid Appeal ID.");return;}
+    setStatus(el,"work","AI Jury is retrieving pages and establishing consensus... (may take 1-2 minutes)",true);
+    await writeTx("adjudicate",[Number(id)],0);
+    setStatus(el,"ok","Verdict resolved for appeal #"+id+". Open the Search tab to view.");
+    $("l_id").value=id;
+  }catch(e){setStatus(el,"err","Error: "+(e.message||e));console.error(e);}
+});
+
+// 2b. Settle fee
+$("s_btn").addEventListener("click", async ()=>{
+  const el=$("s_status"); if(!ensureReady(el))return;
+  try{
+    const id=$("s_id").value.trim(); if(id===""){setStatus(el,"err","Please specify a valid Appeal ID.");return;}
+    setStatus(el,"work","Settling deposit...",true);
+    await writeTx("settle_fee",[Number(id)],0);
+    setStatus(el,"ok","Deposit settled for appeal #"+id+".");
+  }catch(e){setStatus(el,"err","Error: "+(e.message||e));console.error(e);}
+});
+
+// Lookup
+const STATUS_EN={FILED:"Filed",REVIEWING:"Reviewing",RESOLVED:"Resolved",CLOSED:"Settled"};
+const RULING_EN={UPHELD:"UPHELD",OVERTURNED:"OVERTURNED",PARTIAL:"PARTIAL"};
+$("l_btn").addEventListener("click", async ()=>{
+  const el=$("l_status"), out=$("l_result");
+  if(!client||!CONTRACT_ADDRESS){setStatus(el,"err","Connect wallet and configure contract address first.");return;}
+  try{
+    const id=$("l_id").value.trim(); if(id===""){setStatus(el,"err","Please specify a valid Appeal ID.");return;}
+    setStatus(el,"work","Reading state...",true);
+    const raw=await readContract("get_appeal",[Number(id)]);
+    const d=typeof raw==="string"?JSON.parse(raw):raw;
+    clearStatus(el); out.innerHTML=renderAppeal(id,d);
+  }catch(e){setStatus(el,"err","Not found or error: "+(e.message||e));out.innerHTML="";console.error(e);}
+});
+
+function renderAppeal(id,d){
+  const resolved=d.status==="RESOLVED"||d.status==="CLOSED";
+  const sealHtml=resolved&&d.ruling?`<span class="ruling-seal ${d.ruling}">${RULING_EN[d.ruling]||d.ruling}</span>`:`<span class="id">${STATUS_EN[d.status]||d.status}</span>`;
+  const confHtml=resolved?`
+    <div class="conf">JURY CONFIDENCE · ${d.confidence}/100</div>
+    <div class="confbar"><div class="conffill" style="width:${Math.max(d.confidence,3)}%"></div></div>`:"";
+  const ratHtml=resolved&&d.rationale?`<div class="rationale"><div class="rl">AI Jury Rationale</div>${escapeHtml(d.rationale)}</div>`:`<p class="meta" style="margin-top:10px">No verdict reached yet.</p>`;
+  const feeNote=d.status==="CLOSED"?(d.ruling==="UPHELD"?"Deposit transferred to treasury (appeal failed).":"Deposit refunded to creator (appeal succeeded)."):`Deposit locked: <strong>${d.fee}</strong>`;
+  return `<div class="verdict">
+    <div class="vhead"><span class="id">APPEAL #${id} · ${d.platform||"—"} · ${d.action_type}</span>${sealHtml}</div>
+    <div class="vbody">
+      <p class="meta"><strong>Cited policy clause:</strong> ${escapeHtml(d.policy_quote||"—")}</p>
+      <p class="meta"><strong>Creator justification:</strong> ${escapeHtml(d.creator_statement||"—")}</p>
+      ${confHtml}${ratHtml}
+      <p class="links"><strong>Content:</strong> <a href="${d.content_url}" target="_blank" rel="noopener">${shortUrl(d.content_url)}</a> · <strong>Policy:</strong> <a href="${d.policy_url}" target="_blank" rel="noopener">${shortUrl(d.policy_url)}</a></p>
+      <p class="meta" style="margin-top:10px">${feeNote}</p>
+    </div>
+  </div>`;
+}
+function shortUrl(u){try{const x=new URL(u);return x.hostname+(x.pathname.length>14?x.pathname.slice(0,14)+"…":x.pathname);}catch{return (u||"").slice(0,28);}}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+</script>
+</body>
+</html>
