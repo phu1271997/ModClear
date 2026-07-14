@@ -3,25 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ModClear — Content Censorship Appeals Court</title>
+<title>ModClear — Content Moderation Appeals Court</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Public+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Palette: "appellate dossier" — purple-ink + seal red */
-    --ink:#181420;
-    --bg:#14101c;
-    --panel:#1d1828;
-    --panel-2:#241d33;
-    --paper:#ece7f1;
-    --muted:#9b91ad;
-    --line:#352b4a;
-    --seal:#c0392b;
-    --uphold:#c0392b;
-    --overturn:#3fae7a;
-    --partial:#d9a531;
-    --accent:#8b6fc4;
+    --ink:#181420;--bg:#14101c;--panel:#1d1828;--panel-2:#241d33;--paper:#ece7f1;
+    --muted:#9b91ad;--line:#352b4a;--seal:#c0392b;--uphold:#c0392b;--overturn:#3fae7a;
+    --partial:#d9a531;--accent:#8b6fc4;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
@@ -30,26 +20,29 @@
     background-image:radial-gradient(circle at 50% -10%,rgba(139,111,196,.10),transparent 55%);
   }
   .wrap{max-width:1020px;margin:0 auto;padding:0 20px 80px}
-
   header{padding:36px 0 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
   .brand{display:flex;flex-direction:column;gap:4px}
   .docket{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--accent)}
   h1{font-family:'Spectral',serif;font-weight:700;font-size:40px;line-height:1;letter-spacing:-.01em}
-  .tag{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:460px}
+  .tag{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:480px}
   .wallet{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
   button.connect{font-family:'Space Mono',monospace;font-size:12.5px;background:var(--accent);color:#150f20;border:none;padding:11px 18px;cursor:pointer;border-radius:2px;font-weight:700;transition:filter .15s,transform .08s}
   button.connect:hover{filter:brightness(1.12)}
   button.connect:active{transform:translateY(1px)}
   .addr{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted)}
 
-  /* Thesis */
   .thesis{margin:28px 0 6px;padding:24px 26px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--bg));border-radius:4px;position:relative;overflow:hidden}
   .thesis::after{content:"APPEAL";position:absolute;right:-10px;top:6px;font-family:'Spectral',serif;font-weight:700;font-size:120px;color:rgba(139,111,196,.06);letter-spacing:-.04em;pointer-events:none}
   .thesis h2{font-family:'Spectral',serif;font-weight:600;font-size:20px;margin-bottom:6px;position:relative}
-  .thesis p{font-size:13.5px;color:var(--muted);max-width:680px;position:relative}
+  .thesis p{font-size:13.5px;color:var(--muted);max-width:720px;position:relative}
   .rulings{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;position:relative}
   .chip{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:.06em;padding:5px 11px;border-radius:2px;border:1px solid currentColor}
   .chip.up{color:var(--uphold)} .chip.ov{color:var(--overturn)} .chip.pa{color:var(--partial)}
+
+  .statsbar{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 0}
+  .stat{flex:1;min-width:140px;border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:12px 14px}
+  .stat .k{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .stat .v{font-family:'Space Mono',monospace;font-size:18px;margin-top:4px;color:var(--paper)}
 
   nav.tabs{display:flex;margin:32px 0 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
   nav.tabs button{background:none;border:none;cursor:pointer;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:13px 18px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
@@ -73,6 +66,10 @@
   button.act:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
   button.ghost{background:none;border:1px solid var(--accent);color:var(--accent)}
   button.ghost:hover{background:var(--accent);color:#150f20}
+  button.sm{margin-top:0;padding:8px 12px;font-size:11px}
+  .demo-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+  .demo-row button{font-family:'Space Mono',monospace;font-size:11px;padding:8px 12px;background:var(--panel-2);color:var(--paper);border:1px solid var(--line);cursor:pointer;border-radius:2px}
+  .demo-row button:hover{border-color:var(--accent);color:#cbb8f0}
 
   .status{font-family:'Space Mono',monospace;font-size:12.5px;padding:12px 16px;border-radius:2px;margin-top:16px;display:none;align-items:center;gap:12px}
   .status.show{display:flex}
@@ -82,7 +79,6 @@
   .spin{width:14px;height:14px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;flex-shrink:0}
   @keyframes s{to{transform:rotate(360deg)}}
 
-  /* Verdict / dossier */
   .verdict{border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:18px;background:var(--panel)}
   .vhead{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line)}
   .vhead .id{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
@@ -100,6 +96,8 @@
   .links a{color:#b69af0}
   .mono{font-family:'Space Mono',monospace}
   .note{font-size:11.5px;color:var(--muted);margin-top:8px;font-style:italic}
+  .flow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0;font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted)}
+  .flow span{border:1px solid var(--line);padding:4px 8px;border-radius:2px}
   footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   @media(max-width:560px){h1{font-size:30px}.thesis::after{font-size:80px}}
 </style>
@@ -110,7 +108,7 @@
     <div class="brand">
       <span class="docket">Synthetic Jurisdiction · Content Appeals</span>
       <h1>ModClear</h1>
-      <p class="tag">Decentralized appellate court for creators facing wrongful removals, demonetization, or account strikes. Independent AI jury analyzes both content and policy for objective, public, and immutable consensus.</p>
+      <p class="tag">Decentralized appellate court for creators facing wrongful removals, demonetization, or account strikes. An on-chain AI jury reads both content and policy, then publishes an immutable verdict.</p>
     </div>
     <div class="wallet">
       <button class="connect" id="connectBtn">Connect Wallet</button>
@@ -119,26 +117,48 @@
   </header>
 
   <section class="thesis">
-    <h2>Decisions are only upheld if content explicitly violates the cited policy clause.</h2>
-    <p>Every appeal is adjudicated by a decentralized AI jury. Validators analyze the original content and the public policy page directly, reaching consensus only if their independent rulings align—offense alone is not a violation.</p>
+    <h2>Decisions stand only if content explicitly violates the cited policy clause.</h2>
+    <p>Validators fetch live pages on-chain and reach consensus on <strong>meaning</strong> (creator WIN vs LOSE) via <code class="mono">prompt_comparative</code> — not JSON schema. Optional one-round re-trial. Refunds use pull-payment.</p>
     <div class="rulings">
       <span class="chip ov">OVERTURNED · Cleared</span>
       <span class="chip pa">PARTIAL · Partial Win</span>
       <span class="chip up">UPHELD · Upheld</span>
     </div>
+    <div class="flow">
+      <span>1 file + fee</span>
+      <span>2 adjudicate</span>
+      <span>3 optional re-trial</span>
+      <span>4 settle</span>
+      <span>5 withdraw refund</span>
+    </div>
   </section>
+
+  <div class="statsbar">
+    <div class="stat"><div class="k">Total appeals</div><div class="v" id="statTotal">—</div></div>
+    <div class="stat"><div class="k">Treasury</div><div class="v" id="statTreasury">—</div></div>
+    <div class="stat"><div class="k">Your refund credit</div><div class="v" id="statCredit">—</div></div>
+    <div class="stat"><div class="k">Chain</div><div class="v" id="statChain" style="font-size:14px">—</div></div>
+  </div>
 
   <nav class="tabs">
     <button class="active" data-tab="file">1 · File Appeal</button>
-    <button data-tab="judge">2 · Summon AI Jury</button>
-    <button data-tab="lookup">Search Verdicts</button>
+    <button data-tab="judge">2 · Jury &amp; Settle</button>
+    <button data-tab="lookup">Search / Stats</button>
   </nav>
 
   <!-- TAB 1 -->
   <div class="panel active" id="tab-file">
     <div class="card">
-      <h3>File Appeal & Deposit Fee</h3>
-      <p class="sub">Submit the content URL along with the cited policy clause. A spam-prevention deposit is required, fully refunded if the appeal succeeds.</p>
+      <h3>File Appeal &amp; Deposit Fee</h3>
+      <p class="sub">Submit the content URL and the cited policy clause. Anti-spam deposit is refunded on OVERTURNED/PARTIAL (pull-payment after settle).</p>
+
+      <label>Load demo scenario <span class="hint">(fills form with public sample pages on this deploy)</span></label>
+      <div class="demo-row">
+        <button type="button" id="demo_ov" title="Academic content vs violence policy">Demo · OVERTURNED</button>
+        <button type="button" id="demo_up" title="Dangerous how-to vs safety policy">Demo · UPHELD</button>
+        <button type="button" id="demo_pa" title="Mild profanity vs strike">Demo · PARTIAL</button>
+      </div>
+
       <div class="row">
         <div>
           <label>Platform</label>
@@ -148,27 +168,27 @@
           <label>Action Type</label>
           <select id="f_action">
             <option value="REMOVAL">REMOVAL — Content Removal</option>
-            <option value="DEMONETIZATION">DEMONETIZATION — Demonetization</option>
+            <option value="DEMONETIZATION" selected>DEMONETIZATION — Demonetization</option>
             <option value="STRIKE">STRIKE — Account Strike</option>
             <option value="AGE_RESTRICT">AGE_RESTRICT — Age Restriction</option>
           </select>
         </div>
         <div>
           <label>Deposit Fee <span class="hint">(lowest unit)</span></label>
-          <input id="f_fee" type="number" min="1" placeholder="5000" />
+          <input id="f_fee" type="number" min="1" placeholder="5000" value="5000" />
         </div>
       </div>
-      <label>Actioned Content URL <span class="hint">(must be public and accessible)</span></label>
+      <label>Actioned Content URL <span class="hint">(must be public and readable)</span></label>
       <input id="f_content" placeholder="https://..." />
       <label>Cited Policy URL</label>
       <input id="f_policy" placeholder="https://..." />
-      <label>Section of policy clause creator claims was misapplied</label>
-      <textarea id="f_quote" placeholder="e.g. 'Content that is not advertiser-friendly will be demonetized.'"></textarea>
-      <label>Creator Statement (your defense argument)</label>
-      <textarea id="f_statement" placeholder="e.g. The video only discusses academic topics and does not violate this clause."></textarea>
-      <button class="act" id="f_btn">Deposit & Submit Appeal</button>
+      <label>Policy clause the platform cited</label>
+      <textarea id="f_quote" placeholder="e.g. Content that glorifies or incites violence will be demonetized."></textarea>
+      <label>Creator statement (defense)</label>
+      <textarea id="f_statement" placeholder="e.g. The video only discusses academic history and does not glorify violence."></textarea>
+      <button class="act" id="f_btn">Deposit &amp; Submit Appeal</button>
       <div class="status" id="f_status"></div>
-      <p class="note">You must connect your wallet. The deposit is locked in the contract until the final verdict is settled.</p>
+      <p class="note">Connect wallet first. Fee stays locked until settle. After a win, call Withdraw to pull the refund.</p>
     </div>
   </div>
 
@@ -176,34 +196,58 @@
   <div class="panel" id="tab-judge">
     <div class="card">
       <h3>Summon AI Jury</h3>
-      <p class="sub">Validators retrieve content and policy directly from the web, evaluate compliance, and reach consensus. This may take 1-2 minutes for the network to agree.</p>
-      <div class="row"><div><label>Appeal ID</label><input id="j_id" type="number" min="0" placeholder="0" /></div></div>
+      <p class="sub">Validators render content + policy pages and reach consensus on outcome class (WIN vs LOSE). May take 1–2 minutes.</p>
+      <div class="row"><div><label>Appeal ID</label><input id="j_id" type="number" min="0" placeholder="0" value="0" /></div></div>
       <button class="act" id="j_btn">Run Adjudication</button>
       <div class="status" id="j_status"></div>
     </div>
     <div class="card">
-      <h3>Settle Deposit Fee</h3>
-      <p class="sub">Post-verdict settlement: OVERTURNED or PARTIAL refunds the creator. UPHELD transfers the deposit to the treasury.</p>
-      <div class="row"><div><label>Appeal ID</label><input id="s_id" type="number" min="0" placeholder="0" /></div></div>
+      <h3>Request Re-trial (once)</h3>
+      <p class="sub">After RESOLVED and before settle: post a bond to re-queue the appeal for a second jury pass. Max one re-trial.</p>
+      <div class="row">
+        <div><label>Appeal ID</label><input id="r_id" type="number" min="0" placeholder="0" value="0" /></div>
+        <div><label>Bond <span class="hint">(added to fee pot)</span></label><input id="r_bond" type="number" min="1" placeholder="2000" value="2000" /></div>
+      </div>
+      <button class="act ghost" id="r_btn">Post Bond &amp; Request Re-trial</button>
+      <div class="status" id="r_status"></div>
+    </div>
+    <div class="card">
+      <h3>Settle Deposit</h3>
+      <p class="sub">OVERTURNED / PARTIAL → credit creator withdrawable. UPHELD → treasury.</p>
+      <div class="row"><div><label>Appeal ID</label><input id="s_id" type="number" min="0" placeholder="0" value="0" /></div></div>
       <button class="act ghost" id="s_btn">Settle Fee</button>
       <div class="status" id="s_status"></div>
+    </div>
+    <div class="card">
+      <h3>Withdraw Refund Credit</h3>
+      <p class="sub">Pull-payment: after a successful settle, withdraw your credited refund in one transaction.</p>
+      <button class="act" id="w_btn">Withdraw My Credit</button>
+      <div class="status" id="w_status"></div>
     </div>
   </div>
 
   <!-- TAB lookup -->
   <div class="panel" id="tab-lookup">
     <div class="card">
-      <h3>Search Appeals & Verdicts</h3>
-      <p class="sub">Read the state directly from the Intelligent Contract.</p>
-      <div class="row"><div><label>Appeal ID</label><input id="l_id" type="number" min="0" placeholder="0" /></div></div>
+      <h3>Search Appeals &amp; Verdicts</h3>
+      <p class="sub">Read state directly from the Intelligent Contract.</p>
+      <div class="row"><div><label>Appeal ID</label><input id="l_id" type="number" min="0" placeholder="0" value="0" /></div></div>
       <button class="act ghost" id="l_btn">Search</button>
       <div class="status" id="l_status"></div>
+      <div id="l_result"></div>
     </div>
-    <div id="l_result"></div>
+    <div class="card">
+      <h3>Platform Reputation</h3>
+      <p class="sub">On-chain overturn rate (creator-favorable rulings / total resolved) for a platform name.</p>
+      <div class="row"><div><label>Platform name</label><input id="p_name" placeholder="YouTube" value="YouTube" /></div></div>
+      <button class="act ghost" id="p_btn">Load Stats</button>
+      <div class="status" id="p_status"></div>
+      <div id="p_result" class="meta" style="margin-top:12px"></div>
+    </div>
   </div>
 
   <footer>
-    <span>ModClear · Intelligent Contract on GenLayer (testnet Bradbury)</span>
+    <span>ModClear · Intelligent Contract on GenLayer · <a href="https://github.com/phu1271997/ModClear" style="color:#b69af0">GitHub</a></span>
     <span class="mono" id="contractLabel">contract: unconfigured</span>
   </footer>
 </div>
@@ -214,122 +258,335 @@ import { simulator, studionet } from "https://cdn.jsdelivr.net/npm/genlayer-js@l
 import { CONTRACT_ADDRESS, CHAIN } from "./src/config.js";
 
 const chain = CHAIN === "studio" ? studionet : simulator;
-let account=null, client=null;
-const $=(id)=>document.getElementById(id);
-$("contractLabel").textContent="contract: "+(CONTRACT_ADDRESS||"unconfigured");
+let account = null, client = null;
+const $ = (id) => document.getElementById(id);
+$("contractLabel").textContent = "contract: " + (CONTRACT_ADDRESS || "unconfigured");
+$("statChain").textContent = CHAIN || "—";
 
-function setStatus(el,kind,msg,spin=false){el.className="status show "+kind;el.innerHTML=(spin?'<span class="spin"></span>':'')+'<span>'+msg+'</span>';}
-function clearStatus(el){el.className="status";}
+function setStatus(el, kind, msg, spin = false) {
+  el.className = "status show " + kind;
+  el.innerHTML = (spin ? '<span class="spin"></span>' : "") + "<span>" + msg + "</span>";
+}
+function clearStatus(el) { el.className = "status"; }
 
-$("connectBtn").addEventListener("click", async ()=>{
-  try{
-    if(window.ethereum){const [addr]=await window.ethereum.request({method:"eth_requestAccounts"});account=createAccount(addr);}
-    else{account=createAccount();}
-    client=createClient({chain,account});
-    const a=account.address;
-    $("addrLabel").textContent=a.slice(0,6)+"…"+a.slice(-4);
-    $("connectBtn").textContent="Connected";
-  }catch(e){$("addrLabel").textContent="Wallet connection error";console.error(e);}
+function sampleUrl(path) {
+  // Absolute URL so web.render can fetch the live deployed samples
+  try {
+    return new URL(path, window.location.href).href;
+  } catch {
+    return path;
+  }
+}
+
+const DEMOS = {
+  ov: {
+    platform: "YouTube",
+    action: "DEMONETIZATION",
+    fee: "5000",
+    content: () => sampleUrl("samples/content-academic.html"),
+    policy: () => sampleUrl("samples/policy-violence.html"),
+    quote: "Content that glorifies or incites violence will be demonetized.",
+    statement: "This video is a neutral academic overview of historical conflict. It does not glorify or incite violence.",
+  },
+  up: {
+    platform: "TikTok",
+    action: "REMOVAL",
+    fee: "5000",
+    content: () => sampleUrl("samples/content-dangerous.html"),
+    policy: () => sampleUrl("samples/policy-dangerous.html"),
+    quote: "Content providing instructions to build dangerous devices is prohibited and will be removed.",
+    statement: "I believe this is educational content only.",
+  },
+  pa: {
+    platform: "YouTube",
+    action: "STRIKE",
+    fee: "5000",
+    content: () => sampleUrl("samples/content-partial.html"),
+    policy: () => sampleUrl("samples/policy-tiered.html"),
+    quote: "Severe hateful content results in a strike; mild profanity may be age-restricted.",
+    statement: "There was mild profanity in one moment, not hate speech. A full strike is disproportionate.",
+  },
+};
+
+function fillDemo(key) {
+  const d = DEMOS[key];
+  if (!d) return;
+  $("f_platform").value = d.platform;
+  $("f_action").value = d.action;
+  $("f_fee").value = d.fee;
+  $("f_content").value = d.content();
+  $("f_policy").value = d.policy();
+  $("f_quote").value = d.quote;
+  $("f_statement").value = d.statement;
+}
+$("demo_ov").onclick = () => fillDemo("ov");
+$("demo_up").onclick = () => fillDemo("up");
+$("demo_pa").onclick = () => fillDemo("pa");
+
+async function refreshStats() {
+  if (!client || !CONTRACT_ADDRESS) return;
+  try {
+    const total = await readContract("get_total_appeals", []);
+    $("statTotal").textContent = String(total);
+  } catch { $("statTotal").textContent = "—"; }
+  try {
+    const t = await readContract("get_treasury", []);
+    $("statTreasury").textContent = String(t);
+  } catch { $("statTreasury").textContent = "—"; }
+  try {
+    if (account?.address) {
+      const c = await readContract("get_withdrawable", [account.address]);
+      $("statCredit").textContent = String(c);
+    }
+  } catch { $("statCredit").textContent = "—"; }
+}
+
+$("connectBtn").addEventListener("click", async () => {
+  try {
+    if (window.ethereum) {
+      const [addr] = await window.ethereum.request({ method: "eth_requestAccounts" });
+      account = createAccount(addr);
+    } else {
+      account = createAccount();
+    }
+    client = createClient({ chain, account });
+    const a = account.address;
+    $("addrLabel").textContent = a.slice(0, 6) + "…" + a.slice(-4);
+    $("connectBtn").textContent = "Connected";
+    await refreshStats();
+  } catch (e) {
+    $("addrLabel").textContent = "Wallet connection error";
+    console.error(e);
+  }
 });
 
-function ensureReady(el){
-  if(!client||!account){setStatus(el,"err","Please connect your wallet first.");return false;}
-  if(!CONTRACT_ADDRESS){setStatus(el,"err","Contract address is not configured in src/config.js.");return false;}
+function ensureReady(el) {
+  if (!client || !account) {
+    setStatus(el, "err", "Please connect your wallet first.");
+    return false;
+  }
+  if (!CONTRACT_ADDRESS) {
+    setStatus(el, "err", "Contract address is not configured in src/config.js.");
+    return false;
+  }
   return true;
 }
-async function writeTx(method,args,value){
-  const txHash=await client.writeContract({address:CONTRACT_ADDRESS,functionName:method,args,value:value?BigInt(value):0n});
-  await client.waitForTransactionReceipt({hash:txHash,status:"FINALIZED"});
+
+async function writeTx(method, args, value) {
+  const txHash = await client.writeContract({
+    address: CONTRACT_ADDRESS,
+    functionName: method,
+    args,
+    value: value ? BigInt(value) : 0n,
+  });
+  await client.waitForTransactionReceipt({ hash: txHash, status: "FINALIZED" });
   return txHash;
 }
-async function readContract(method,args){return client.readContract({address:CONTRACT_ADDRESS,functionName:method,args});}
+async function readContract(method, args) {
+  return client.readContract({ address: CONTRACT_ADDRESS, functionName: method, args });
+}
 
-document.querySelectorAll("nav.tabs button").forEach(b=>{
-  b.addEventListener("click",()=>{
-    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");$("tab-"+b.dataset.tab).classList.add("active");
+document.querySelectorAll("nav.tabs button").forEach((b) => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll("nav.tabs button").forEach((x) => x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach((x) => x.classList.remove("active"));
+    b.classList.add("active");
+    $("tab-" + b.dataset.tab).classList.add("active");
   });
 });
 
 // 1. File appeal
-$("f_btn").addEventListener("click", async ()=>{
-  const el=$("f_status"); if(!ensureReady(el))return;
-  try{
-    const platform=$("f_platform").value.trim();
-    const action=$("f_action").value;
-    const fee=$("f_fee").value.trim();
-    const content=$("f_content").value.trim();
-    const policy=$("f_policy").value.trim();
-    const quote=$("f_quote").value.trim();
-    const statement=$("f_statement").value.trim();
-    if(!fee||!content||!policy){setStatus(el,"err","Spam-prevention fee, content URL, and policy URL are required.");return;}
-    setStatus(el,"work","Submitting transaction & awaiting consensus...",true);
-    await writeTx("file_appeal",[platform,action,content,policy,quote,statement],fee);
-    const total=await readContract("get_total_appeals",[]);
-    setStatus(el,"ok","Submitted appeal #"+(Number(total)-1)+" and locked deposit.");
-  }catch(e){setStatus(el,"err","Error: "+(e.message||e));console.error(e);}
+$("f_btn").addEventListener("click", async () => {
+  const el = $("f_status");
+  if (!ensureReady(el)) return;
+  try {
+    const platform = $("f_platform").value.trim();
+    const action = $("f_action").value;
+    const fee = $("f_fee").value.trim();
+    const content = $("f_content").value.trim();
+    const policy = $("f_policy").value.trim();
+    const quote = $("f_quote").value.trim();
+    const statement = $("f_statement").value.trim();
+    if (!fee || !content || !policy) {
+      setStatus(el, "err", "Fee, content URL, and policy URL are required.");
+      return;
+    }
+    setStatus(el, "work", "Submitting transaction & awaiting consensus...", true);
+    await writeTx("file_appeal", [platform, action, content, policy, quote, statement], fee);
+    const total = await readContract("get_total_appeals", []);
+    const id = Number(total) - 1;
+    setStatus(el, "ok", "Submitted appeal #" + id + " and locked deposit.");
+    $("j_id").value = id;
+    $("r_id").value = id;
+    $("s_id").value = id;
+    $("l_id").value = id;
+    await refreshStats();
+  } catch (e) {
+    setStatus(el, "err", "Error: " + (e.message || e));
+    console.error(e);
+  }
 });
 
 // 2. Adjudicate
-$("j_btn").addEventListener("click", async ()=>{
-  const el=$("j_status"); if(!ensureReady(el))return;
-  try{
-    const id=$("j_id").value.trim(); if(id===""){setStatus(el,"err","Please specify a valid Appeal ID.");return;}
-    setStatus(el,"work","AI Jury is retrieving pages and establishing consensus... (may take 1-2 minutes)",true);
-    await writeTx("adjudicate",[Number(id)],0);
-    setStatus(el,"ok","Verdict resolved for appeal #"+id+". Open the Search tab to view.");
-    $("l_id").value=id;
-  }catch(e){setStatus(el,"err","Error: "+(e.message||e));console.error(e);}
+$("j_btn").addEventListener("click", async () => {
+  const el = $("j_status");
+  if (!ensureReady(el)) return;
+  try {
+    const id = $("j_id").value.trim();
+    if (id === "") { setStatus(el, "err", "Please specify a valid Appeal ID."); return; }
+    setStatus(el, "work", "AI Jury is rendering pages and establishing consensus... (1–2 min)", true);
+    await writeTx("adjudicate", [Number(id)], 0);
+    setStatus(el, "ok", "Verdict resolved for appeal #" + id + ". Open Search to view, or settle/re-try.");
+    $("l_id").value = id;
+    await refreshStats();
+  } catch (e) {
+    setStatus(el, "err", "Error: " + (e.message || e));
+    console.error(e);
+  }
 });
 
-// 2b. Settle fee
-$("s_btn").addEventListener("click", async ()=>{
-  const el=$("s_status"); if(!ensureReady(el))return;
-  try{
-    const id=$("s_id").value.trim(); if(id===""){setStatus(el,"err","Please specify a valid Appeal ID.");return;}
-    setStatus(el,"work","Settling deposit...",true);
-    await writeTx("settle_fee",[Number(id)],0);
-    setStatus(el,"ok","Deposit settled for appeal #"+id+".");
-  }catch(e){setStatus(el,"err","Error: "+(e.message||e));console.error(e);}
+// 2b. Re-trial
+$("r_btn").addEventListener("click", async () => {
+  const el = $("r_status");
+  if (!ensureReady(el)) return;
+  try {
+    const id = $("r_id").value.trim();
+    const bond = $("r_bond").value.trim();
+    if (id === "" || !bond) { setStatus(el, "err", "Appeal ID and bond required."); return; }
+    setStatus(el, "work", "Posting re-trial bond...", true);
+    await writeTx("request_retrial", [Number(id)], bond);
+    setStatus(el, "ok", "Re-trial filed for #" + id + ". Run Adjudication again.");
+    $("j_id").value = id;
+    await refreshStats();
+  } catch (e) {
+    setStatus(el, "err", "Error: " + (e.message || e));
+    console.error(e);
+  }
+});
+
+// 2c. Settle
+$("s_btn").addEventListener("click", async () => {
+  const el = $("s_status");
+  if (!ensureReady(el)) return;
+  try {
+    const id = $("s_id").value.trim();
+    if (id === "") { setStatus(el, "err", "Please specify a valid Appeal ID."); return; }
+    setStatus(el, "work", "Settling deposit...", true);
+    await writeTx("settle_fee", [Number(id)], 0);
+    setStatus(el, "ok", "Deposit settled for appeal #" + id + ". If you won, use Withdraw.");
+    await refreshStats();
+  } catch (e) {
+    setStatus(el, "err", "Error: " + (e.message || e));
+    console.error(e);
+  }
+});
+
+// 2d. Withdraw
+$("w_btn").addEventListener("click", async () => {
+  const el = $("w_status");
+  if (!ensureReady(el)) return;
+  try {
+    setStatus(el, "work", "Withdrawing credit...", true);
+    await writeTx("withdraw", [], 0);
+    setStatus(el, "ok", "Withdraw complete.");
+    await refreshStats();
+  } catch (e) {
+    setStatus(el, "err", "Error: " + (e.message || e));
+    console.error(e);
+  }
 });
 
 // Lookup
-const STATUS_EN={FILED:"Filed",REVIEWING:"Reviewing",RESOLVED:"Resolved",CLOSED:"Settled"};
-const RULING_EN={UPHELD:"UPHELD",OVERTURNED:"OVERTURNED",PARTIAL:"PARTIAL"};
-$("l_btn").addEventListener("click", async ()=>{
-  const el=$("l_status"), out=$("l_result");
-  if(!client||!CONTRACT_ADDRESS){setStatus(el,"err","Connect wallet and configure contract address first.");return;}
-  try{
-    const id=$("l_id").value.trim(); if(id===""){setStatus(el,"err","Please specify a valid Appeal ID.");return;}
-    setStatus(el,"work","Reading state...",true);
-    const raw=await readContract("get_appeal",[Number(id)]);
-    const d=typeof raw==="string"?JSON.parse(raw):raw;
-    clearStatus(el); out.innerHTML=renderAppeal(id,d);
-  }catch(e){setStatus(el,"err","Not found or error: "+(e.message||e));out.innerHTML="";console.error(e);}
+const STATUS_EN = { FILED: "Filed", REVIEWING: "Reviewing", RESOLVED: "Resolved", CLOSED: "Settled" };
+$("l_btn").addEventListener("click", async () => {
+  const el = $("l_status"), out = $("l_result");
+  if (!client || !CONTRACT_ADDRESS) {
+    setStatus(el, "err", "Connect wallet and configure contract address first.");
+    return;
+  }
+  try {
+    const id = $("l_id").value.trim();
+    if (id === "") { setStatus(el, "err", "Please specify a valid Appeal ID."); return; }
+    setStatus(el, "work", "Reading state...", true);
+    const raw = await readContract("get_appeal", [Number(id)]);
+    const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+    clearStatus(el);
+    out.innerHTML = renderAppeal(id, d);
+  } catch (e) {
+    setStatus(el, "err", "Not found or error: " + (e.message || e));
+    out.innerHTML = "";
+    console.error(e);
+  }
 });
 
-function renderAppeal(id,d){
-  const resolved=d.status==="RESOLVED"||d.status==="CLOSED";
-  const sealHtml=resolved&&d.ruling?`<span class="ruling-seal ${d.ruling}">${RULING_EN[d.ruling]||d.ruling}</span>`:`<span class="id">${STATUS_EN[d.status]||d.status}</span>`;
-  const confHtml=resolved?`
-    <div class="conf">JURY CONFIDENCE · ${d.confidence}/100</div>
-    <div class="confbar"><div class="conffill" style="width:${Math.max(d.confidence,3)}%"></div></div>`:"";
-  const ratHtml=resolved&&d.rationale?`<div class="rationale"><div class="rl">AI Jury Rationale</div>${escapeHtml(d.rationale)}</div>`:`<p class="meta" style="margin-top:10px">No verdict reached yet.</p>`;
-  const feeNote=d.status==="CLOSED"?(d.ruling==="UPHELD"?"Deposit transferred to treasury (appeal failed).":"Deposit refunded to creator (appeal succeeded)."):`Deposit locked: <strong>${d.fee}</strong>`;
+$("p_btn").addEventListener("click", async () => {
+  const el = $("p_status"), out = $("p_result");
+  if (!client || !CONTRACT_ADDRESS) {
+    setStatus(el, "err", "Connect wallet and configure contract first.");
+    return;
+  }
+  try {
+    const name = $("p_name").value.trim() || "YouTube";
+    setStatus(el, "work", "Loading...", true);
+    const raw = await readContract("get_platform_stats", [name]);
+    const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+    clearStatus(el);
+    out.innerHTML =
+      "<strong>" + escapeHtml(d.platform) + "</strong> · resolved: " + d.total_resolved +
+      " · creator-favorable: " + d.creator_favorable +
+      " · overturn rate: " + d.overturn_rate_pct + "%";
+  } catch (e) {
+    setStatus(el, "err", "Error: " + (e.message || e));
+    out.innerHTML = "";
+  }
+});
+
+function renderAppeal(id, d) {
+  const resolved = d.status === "RESOLVED" || d.status === "CLOSED";
+  const sealHtml = resolved && d.ruling
+    ? `<span class="ruling-seal ${d.ruling}">${d.ruling}</span>`
+    : `<span class="id">${STATUS_EN[d.status] || d.status}</span>`;
+  const confHtml = resolved
+    ? `<div class="conf">JURY CONFIDENCE · ${d.confidence}/100</div>
+       <div class="confbar"><div class="conffill" style="width:${Math.max(Number(d.confidence) || 0, 3)}%"></div></div>`
+    : "";
+  const ratHtml = resolved && d.rationale
+    ? `<div class="rationale"><div class="rl">AI Jury Rationale</div>${escapeHtml(d.rationale)}</div>`
+    : `<p class="meta" style="margin-top:10px">No verdict reached yet.</p>`;
+  const feeNote = d.status === "CLOSED"
+    ? (d.ruling === "UPHELD"
+        ? "Deposit transferred to treasury (appeal failed)."
+        : "Deposit credited for withdraw (appeal succeeded).")
+    : `Deposit locked: <strong>${d.fee}</strong>`;
+  const roundNote = `Round ${d.appeal_round ?? 0}` +
+    (d.appealed ? " · re-trial used" : " · re-trial available after resolve") +
+    (d.previous_ruling ? ` · prior ruling: ${d.previous_ruling}` : "");
   return `<div class="verdict">
-    <div class="vhead"><span class="id">APPEAL #${id} · ${d.platform||"—"} · ${d.action_type}</span>${sealHtml}</div>
+    <div class="vhead"><span class="id">APPEAL #${id} · ${escapeHtml(d.platform || "—")} · ${d.action_type}</span>${sealHtml}</div>
     <div class="vbody">
-      <p class="meta"><strong>Cited policy clause:</strong> ${escapeHtml(d.policy_quote||"—")}</p>
-      <p class="meta"><strong>Creator justification:</strong> ${escapeHtml(d.creator_statement||"—")}</p>
+      <p class="meta"><strong>Cited policy clause:</strong> ${escapeHtml(d.policy_quote || "—")}</p>
+      <p class="meta"><strong>Creator justification:</strong> ${escapeHtml(d.creator_statement || "—")}</p>
+      <p class="meta"><strong>Lifecycle:</strong> ${roundNote}</p>
       ${confHtml}${ratHtml}
       <p class="links"><strong>Content:</strong> <a href="${d.content_url}" target="_blank" rel="noopener">${shortUrl(d.content_url)}</a> · <strong>Policy:</strong> <a href="${d.policy_url}" target="_blank" rel="noopener">${shortUrl(d.policy_url)}</a></p>
       <p class="meta" style="margin-top:10px">${feeNote}</p>
     </div>
   </div>`;
 }
-function shortUrl(u){try{const x=new URL(u);return x.hostname+(x.pathname.length>14?x.pathname.slice(0,14)+"…":x.pathname);}catch{return (u||"").slice(0,28);}}
-function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function shortUrl(u) {
+  try {
+    const x = new URL(u);
+    return x.hostname + (x.pathname.length > 18 ? x.pathname.slice(0, 18) + "…" : x.pathname);
+  } catch {
+    return (u || "").slice(0, 28);
+  }
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// Auto-fill first demo so the form is never blank for judges
+fillDemo("ov");
 </script>
 </body>
 </html>

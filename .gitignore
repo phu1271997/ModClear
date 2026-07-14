@@ -4,3 +4,9 @@ node_modules/
 frontend/dist/
 .env
 .vercel
+.pytest_cache/
+**/__pycache__/
+*.pyc
+how-to-scrore copy.md
+read-me copy.md
+*.original.md
