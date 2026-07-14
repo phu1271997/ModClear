@@ -2,6 +2,18 @@
 
 Follows [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] — Address reviewer lint + verification evidence
+
+### Fixed (reviewer feedback)
+- TreeMap key-type: confirmed `TreeMap[str, …]` only (R19); no bigint keys.
+- Storage struct: `Appeal` now `@allow_storage` + `@dataclass` (required by GenVM storage).
+- SDK dependency: strict header `# v0.2.16` + official `Depends` py-genlayer hash + `from genlayer import *`.
+- Pure-ASCII contract source; `UserError` for rejections; `u256(int(...))` on transfers.
+
+### Added
+- `docs/STUDIO_VERIFICATION.md` — exact Studio steps for  
+  `file_appeal` → `adjudicate` → `get_appeal` → `settle_fee` + evidence pack for portal.
+
 ## [1.1.0] — Builder resubmission quality pass
 
 ### Changed
@@ -20,7 +32,7 @@ Follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 - Removed accidental junk directory from brace-expansion (`{contracts,frontend...`).
-- Validator no longer returns `True` when independent LLM fails (eliminated “schema-only soft pass”).
+- Validator no longer returns `True` when independent LLM fails (eliminated schema-only soft pass).
 
 ## [1.0.0] — Initial release
 

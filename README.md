@@ -162,9 +162,18 @@ Covers happy path, input validation, settle guards, owner-only treasury, re-tria
 
 ## 10. Docs
 
+- [`docs/STUDIO_VERIFICATION.md`](docs/STUDIO_VERIFICATION.md) — **judge path:** deploy + `file_appeal` → `adjudicate` → `get_appeal` → `settle_fee`  
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)  
 - [`docs/COMMON_ERRORS.md`](docs/COMMON_ERRORS.md) — GenLayer deploy rules  
 - [`CHANGELOG.md`](CHANGELOG.md)
+
+### Reviewer notes (lint)
+
+Original feedback flagged TreeMap key-type + SDK dependency. Current contract:
+
+- `TreeMap[str, …]` only (never `bigint` keys)  
+- `# v0.2.16` + official `Depends: py-genlayer:…`  
+- `@allow_storage` + `@dataclass` on `Appeal`
 
 ---
 
